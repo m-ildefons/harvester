@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"html"
 	"net/http"
 	"net/url"
 	"runtime/debug"
@@ -19,6 +20,7 @@ import (
 	"github.com/harvester/harvester/pkg/api/uiinfo"
 	"github.com/harvester/harvester/pkg/config"
 	harvesterServer "github.com/harvester/harvester/pkg/server/http"
+	"github.com/harvester/harvester/pkg/server/middlewares"
 	"github.com/harvester/harvester/pkg/server/ui"
 )
 
@@ -66,6 +68,12 @@ func (r *Router) Routes(h router.Handlers) http.Handler {
 	// This is for manually testing the recovery handler below
 	m.HandleFunc("/v1/harvester/dont-panic", func(_ http.ResponseWriter, _ *http.Request) {
 		panic("Do you know where your towel is?")
+	})
+
+	amw := middlewares.NewAuthMiddleware(r.scaled.CoreFactory.Core().V1().Secret().Cache())
+	m.Use(amw.Middleware)
+	m.HandleFunc("/v1/harvester/foobar", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
 	})
 
 	// adds collection action support
