@@ -15,6 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	corefake "k8s.io/client-go/kubernetes/fake"
+	"k8s.io/utils/ptr"
 	kubevirtv1 "kubevirt.io/api/core/v1"
 	kubevirtutil "kubevirt.io/kubevirt/pkg/virt-operator/util"
 
@@ -25,6 +26,109 @@ import (
 	"github.com/harvester/harvester/pkg/util/fakeclients"
 	cniv1 "github.com/k8snetworkplumbingwg/network-attachment-definition-client/pkg/apis/k8s.cni.cncf.io/v1"
 )
+
+func TestStopAction(t *testing.T) {
+	type input struct {
+		namespace string
+		name      string
+		nodeName  string
+		vm        *kubevirtv1.VirtualMachine
+		kubeVirt  *kubevirtv1.KubeVirt
+	}
+	type output struct {
+		vms []*kubevirtv1.VirtualMachine
+		err error
+	}
+	var testCases = []struct {
+		name     string
+		given    input
+		expected output
+	}{
+		{
+			name: "stopVM triggered",
+			given: input{
+				namespace: "default",
+				name:      "test",
+				vm: &kubevirtv1.VirtualMachine{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "default",
+						Name:      "test",
+					},
+					Spec: kubevirtv1.VirtualMachineSpec{
+						RunStrategy: ptr.To(kubevirtv1.RunStrategyAlways),
+					},
+				},
+			},
+			expected: output{
+				vms: []*kubevirtv1.VirtualMachine{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "default",
+							Name:      "test",
+						},
+						Spec: kubevirtv1.VirtualMachineSpec{
+							RunStrategy: ptr.To(kubevirtv1.RunStrategyHalted),
+						},
+					},
+				},
+				err: nil,
+			},
+		},
+	}
+
+	var fakeNodeList = []*corev1.Node{
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "fake-node1",
+			},
+		},
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "fake-node2",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		var clientset = fake.NewSimpleClientset()
+		var coreclientset = corefake.NewSimpleClientset()
+		if tc.given.vm != nil {
+			err := clientset.Tracker().Add(tc.given.vm)
+			assert.Nil(t, err, "Mock resource should add into fake controller tracker")
+		}
+		if tc.given.kubeVirt != nil {
+			err := clientset.Tracker().Add(tc.given.kubeVirt)
+			assert.Nil(t, err, "Mock resource should add into fake controller tracker")
+		}
+
+		for _, node := range fakeNodeList {
+			err := coreclientset.Tracker().Add(node)
+			assert.Nil(t, err, "Mock resource should add into fake controller tracker")
+		}
+
+		var handler = &vmActionHandler{
+			nodeCache:     fakeclients.NodeCache(coreclientset.CoreV1().Nodes),
+			kubevirtCache: fakeclients.KubeVirtCache(clientset.KubevirtV1().KubeVirts),
+			vms:           fakeclients.VirtualMachineClient(clientset.KubevirtV1().VirtualMachines),
+			vmCache:       fakeclients.VirtualMachineCache(clientset.KubevirtV1().VirtualMachines),
+		}
+
+		var actual output
+		var err error
+		actual.err = handler.stopVM(tc.given.namespace, tc.given.name)
+		assert.Nil(t, err, "stopVM should return no error")
+		actual.vms, err = handler.vmCache.List(tc.given.namespace, labels.Everything())
+		assert.Nil(t, err, "List should return no error")
+
+		assert.Equal(t, tc.expected.vms, actual.vms, "case %q", tc.name)
+		if tc.expected.err != nil && actual.err != nil {
+			//errors from pkg/errors track stacks so we only compare the error string here
+			assert.Equal(t, tc.expected.err.Error(), actual.err.Error(), "case %q", tc.name)
+		} else {
+			assert.Equal(t, tc.expected.err, actual.err, "case %q", tc.name)
+		}
+	}
+}
 
 func TestMigrateAction(t *testing.T) {
 	type input struct {
