@@ -560,6 +560,10 @@ github.com/harvester/go-common/version
 github.com/harvester/harvester-network-controller/pkg/apis/network.harvesterhci.io
 github.com/harvester/harvester-network-controller/pkg/apis/network.harvesterhci.io/v1beta1
 github.com/harvester/harvester-network-controller/pkg/utils
+# github.com/harvester/harvester/pkg/apis v0.0.0 => ./pkg/apis
+## explicit; go 1.26.0
+github.com/harvester/harvester/pkg/apis/harvesterhci.io
+github.com/harvester/harvester/pkg/apis/harvesterhci.io/v1beta1
 # github.com/harvester/node-manager v1.7.0-rc1.0.20260616060042-1afd5765b4b9
 ## explicit; go 1.26
 github.com/harvester/node-manager/pkg/apis/node.harvesterhci.io
@@ -3048,6 +3052,7 @@ sigs.k8s.io/yaml/kyaml
 # github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.1
 # github.com/google/gnostic-models => github.com/google/gnostic-models v0.7.1
 # github.com/harvester/harvester-network-controller => github.com/harvester/harvester-network-controller v1.6.0-rc3
+# github.com/harvester/harvester/pkg/apis => ./pkg/apis
 # github.com/nsf/termbox-go => github.com/Harvester/termbox-go v1.1.1-0.20210318083914-8ab92204a400
 # github.com/opencontainers/runc => github.com/opencontainers/runc v1.1.14
 # github.com/openshift/api => github.com/openshift/api v0.0.0-20191219222812-2987a591a72c

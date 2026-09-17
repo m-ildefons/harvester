@@ -11,6 +11,8 @@ replace (
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.1
 	github.com/google/gnostic-models => github.com/google/gnostic-models v0.7.1
 	github.com/harvester/harvester-network-controller => github.com/harvester/harvester-network-controller v1.6.0-rc3
+
+	github.com/harvester/harvester/pkg/apis => ./pkg/apis
 	github.com/nsf/termbox-go => github.com/Harvester/termbox-go v1.1.1-0.20210318083914-8ab92204a400
 	github.com/opencontainers/runc => github.com/opencontainers/runc v1.1.14
 	github.com/openshift/api => github.com/openshift/api v0.0.0-20191219222812-2987a591a72c
@@ -70,6 +72,7 @@ require (
 	github.com/guonaihong/gout v0.1.3
 	github.com/harvester/go-common v0.0.0-20260119194217-0f17176ce67e
 	github.com/harvester/harvester-network-controller v1.6.0-rc3
+	github.com/harvester/harvester/pkg/apis v0.0.0
 	github.com/harvester/node-manager v1.7.0-rc1.0.20260616060042-1afd5765b4b9
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imdario/mergo v0.3.16
@@ -103,7 +106,6 @@ require (
 	github.com/rancher/steve v0.7.17
 	github.com/rancher/system-upgrade-controller/pkg/apis v0.0.0-20250306000150-b1a9781accab
 	github.com/rancher/wharfie v0.6.8
-	github.com/rancher/wrangler v1.1.2
 	github.com/rancher/wrangler/v3 v3.2.4
 	github.com/rancher/yip v1.9.2
 	github.com/robfig/cron v1.2.0
@@ -328,6 +330,7 @@ require (
 	github.com/rancher/kubernetes-provider-detector v0.1.5 // indirect
 	github.com/rancher/remotedialer v0.4.5-rc.3 // indirect
 	github.com/rancher/rke v1.8.5 // indirect
+	github.com/rancher/wrangler v1.1.2 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
